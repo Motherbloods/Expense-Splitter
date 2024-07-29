@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expense Splitter - Buat Room Baru</title>
+  </head>
+  <body>
+    <h1>Buat Room Baru</h1>
+    <form action="/create-room" method="POST">
+      <div>
+        <label for="name">Nama Room:</label>
+        <input type="text" id="name" name="name" required />
+      </div>
+      <div>
+        <label for="name">Admin:</label>
+        <input type="text" id="createdBy" name="createdBy" required />
+      </div>
+      <div>
+        <label for="participants">Partisipan (pisahkan dengan koma):</label>
+        <input type="text" id="participants" name="participants" required />
+        <small>Contoh: John, Jane, Bob</small>
+      </div>
+      <button type="submit">Buat Room</button>
+    </form>
+    <a href="/">Kembali ke Daftar Room</a>
+  </body>
+</html>
