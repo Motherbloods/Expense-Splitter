@@ -132,9 +132,6 @@ function calculateSettlements(totalSplits, expenses) {
 const totalSplits = calculateTotalSplits(expenses);
 const settlements = calculateSettlements(totalSplits, expenses);
 
-console.log("Total Splits:", totalSplits);
-console.log("Settlements:", settlements);
-
 // const expenses = [
 //   {
 //     description: "Sewa individu",

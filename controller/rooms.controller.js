@@ -36,7 +36,6 @@ const dashboard = async (req, res) => {
 
     const detailedSplits = calculateDetailedSplits(expenses);
     const finalSplits = calculateSimplifiedSplits(detailedSplits);
-    console.log(finalSplits);
     // const settlements = calculateDetailedSettlements(detailedSplits);
     res.render("dashboard", { room, expenses, detailedSplits, finalSplits });
   } catch (err) {

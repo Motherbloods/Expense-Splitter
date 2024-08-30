@@ -4,52 +4,57 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Expense Splitter - Edit Pengeluaran</title>
+    <link href="/styles/shared-styles.css" rel="stylesheet" />
   </head>
   <body>
-    <h1>Edit Pengeluaran</h1>
-    <form action="/edit/<%= expense.id %>" method="POST">
-      <div>
-        <label for="name">Nama Pengeluaran:</label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          value="<%= expense.name %>"
-          required
-        />
-      </div>
-      <div>
-        <label for="paidBy">Dibayar Oleh:</label>
-        <input
-          type="text"
-          id="paidBy"
-          name="paidBy"
-          value="<%= expense.paidBy %>"
-          required
-        />
-      </div>
-      <div>
-        <label for="total">Total Pengeluaran:</label>
-        <input
-          type="number"
-          id="total"
-          name="total"
-          value="<%= expense.total %>"
-          required
-        />
-      </div>
-      <div>
-        <label for="participants">Partisipan (pisahkan dengan koma):</label>
-        <input
-          type="text"
-          id="participants"
-          name="participants"
-          value="<%= expense.participants.join(', ') %>"
-          required
-        />
-      </div>
-      <button type="submit">Perbarui Pengeluaran</button>
-    </form>
-    <a href="/dashboard/<%= roomId %>">Batal dan Kembali ke Dashboard</a>
+    <div class="container">
+      <h1>Edit Pengeluaran</h1>
+      <form action="/edit/<%= expense.id %>" method="POST">
+        <div>
+          <label for="name">Nama Pengeluaran:</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value="<%= expense.name %>"
+            required
+          />
+        </div>
+        <div>
+          <label for="paidBy">Dibayar Oleh:</label>
+          <input
+            type="text"
+            id="paidBy"
+            name="paidBy"
+            value="<%= expense.paidBy %>"
+            required
+          />
+        </div>
+        <div>
+          <label for="total">Total Pengeluaran:</label>
+          <input
+            type="number"
+            id="total"
+            name="total"
+            value="<%= expense.total %>"
+            required
+          />
+        </div>
+        <div>
+          <label for="participants">Partisipan (pisahkan dengan koma):</label>
+          <input
+            type="text"
+            id="participants"
+            name="participants"
+            value="<%= expense.participants.join(', ') %>"
+            required
+          />
+        </div>
+        <button type="submit" class="btn btn-edit">Perbarui Pengeluaran</button>
+      </form>
+      <a href="/dashboard/<%= roomId %>" class="btn"
+        >Batal dan Kembali ke Dashboard</a
+      >
+    </div>
   </body>
 </html>

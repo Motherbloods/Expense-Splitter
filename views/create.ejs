@@ -4,41 +4,45 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Expense Splitter - Tambah Pengeluaran Baru</title>
+    <link href="/styles/shared-styles.css" rel="stylesheet" />
   </head>
   <body>
-    <h1>Tambah Pengeluaran Baru untuk <%= room.name %></h1>
-    <form action="/create/<%= roomId %>" method="POST">
-      <div>
-        <label for="name">Nama Pengeluaran:</label>
-        <input type="text" id="name" name="name" required />
-      </div>
-      <div>
-        <label for="paidBy">Dibayar Oleh:</label>
-        <input type="text" id="paidBy" name="paidBy" required />
-      </div>
-      <div>
-        <label for="total">Total Pengeluaran:</label>
-        <input
-          type="number"
-          id="total"
-          name="total"
-          required
-          min="0"
-          step="0.01"
-        />
-      </div>
-      <div>
-        <label for="participants">Partisipan (pisahkan dengan koma):</label>
-        <input
-          type="text"
-          id="participants"
-          name="participants"
-          required
-          value="<%= room.participants.join(', ') %>"
-        />
-      </div>
-      <button type="submit">Simpan Pengeluaran</button>
-    </form>
-    <a href="/dashboard/<%= roomId %>">Kembali ke Dashboard</a>
+    <div class="container">
+      <h1>Tambah Pengeluaran Baru</h1>
+      <h2><%= room.name %></h2>
+      <form action="/create/<%= roomId %>" method="POST">
+        <div>
+          <label for="name">Nama Pengeluaran:</label>
+          <input type="text" id="name" name="name" required />
+        </div>
+        <div>
+          <label for="paidBy">Dibayar Oleh:</label>
+          <input type="text" id="paidBy" name="paidBy" required />
+        </div>
+        <div>
+          <label for="total">Total Pengeluaran:</label>
+          <input
+            type="number"
+            id="total"
+            name="total"
+            required
+            min="0"
+            step="0.01"
+          />
+        </div>
+        <div>
+          <label for="participants">Partisipan (pisahkan dengan koma):</label>
+          <input
+            type="text"
+            id="participants"
+            name="participants"
+            required
+            value="<%= room.participants.join(', ') %>"
+          />
+        </div>
+        <button type="submit" class="btn">Simpan Pengeluaran</button>
+      </form>
+      <a href="/dashboard/<%= roomId %>" class="btn">Kembali ke Dashboard</a>
+    </div>
   </body>
 </html>

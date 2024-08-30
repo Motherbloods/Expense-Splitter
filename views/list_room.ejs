@@ -4,18 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Expense Splitter - Daftar Room</title>
+    <link href="/styles/shared-styles.css" rel="stylesheet" />
   </head>
   <body>
-    <h1>Expense Splitter</h1>
-    <h2>Daftar Room</h2>
-    <ul>
-      <!-- Loop through rooms -->
-      <% rooms.forEach(function(room) { %>
-      <li>
-        <a href="/dashboard/<%= room.id %>"><%= room.name %></a>
-      </li>
-      <% }); %>
-    </ul>
-    <a href="/create-room">Buat Room Baru</a>
+    <div class="container">
+      <h1>Expense Splitter</h1>
+      <h2>Daftar Room</h2>
+      <ul>
+        <!-- Loop through rooms -->
+        <% rooms.forEach(function(room) { %>
+        <li>
+          <a href="/dashboard/<%= room.id %>"><%= room.name %></a>
+        </li>
+        <% }); %>
+      </ul>
+      <a href="/create-room" class="btn btn-edit">Buat Room Baru</a>
+    </div>
   </body>
 </html>
