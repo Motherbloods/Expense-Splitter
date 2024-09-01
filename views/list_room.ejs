@@ -5,20 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Expense Splitter - Daftar Room</title>
     <link href="/styles/shared-styles.css" rel="stylesheet" />
+    <script src="/js/list_room.js" defer></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
   </head>
   <body>
     <div class="container">
-      <h1>Expense Splitter</h1>
+      <header class="header">
+        <h1>Expense Splitter</h1>
+        <div class="header-buttons">
+          <a href="/create-room" class="btn btn-create-room">
+            <span class="button-text">Buat Room Baru</span>
+            <i class="fas fa-plus icon-mobile"></i>
+          </a>
+          <form action="/logout" method="POST" style="display: inline">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <button type="submit" class="btn btn-logout">
+              <span class="button-text">Logout</span>
+              <i class="fas fa-sign-out-alt icon-mobile"></i>
+            </button>
+          </form>
+        </div>
+      </header>
       <h2>Daftar Room</h2>
-      <ul>
+      <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Cari room..." />
+      </div>
+      <% if (rooms && rooms.length > 0) { %>
+      <div class="room-list" id="roomList">
         <!-- Loop through rooms -->
         <% rooms.forEach(function(room) { %>
-        <li>
-          <a href="/dashboard/<%= room.id %>"><%= room.name %></a>
-        </li>
+        <div class="room-item" data-room-name="<%= room.name.toLowerCase() %>">
+          <a href="/dashboard/<%= room.id %>" class="room-link">
+            <div class="room-name">
+              <%= room.name %> || <%=room.participants%>
+            </div>
+          </a>
+          <form
+            action="/delete-room/<%= room.id %>"
+            method="POST"
+            class="delete-form"
+            onsubmit="return confirm('Apakah Anda yakin ingin menghapus room ini?');"
+          >
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <button type="submit" class="btn btn-delete" style="padding: 10px">
+              <span class="button-text">Hapus</span>
+              <i class="fas fa-trash icon-mobile"></i>
+            </button>
+          </form>
+        </div>
         <% }); %>
-      </ul>
-      <a href="/create-room" class="btn btn-edit">Buat Room Baru</a>
+      </div>
+      <% } else { %>
+      <p>Belum ada Daftar Room %></p>
+      <% } %>
     </div>
   </body>
 </html>

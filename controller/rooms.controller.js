@@ -3,7 +3,9 @@ const Expense = require("../models/Expense");
 
 const list_rooms = async (req, res) => {
   try {
-    const rooms = await Room.find().sort({ createdAt: -1 });
+    const rooms = await Room.find({ userId: req.params.userId }).sort({
+      createdAt: -1,
+    });
     res.render("list_room", { rooms });
   } catch (err) {
     console.error(err);
@@ -11,35 +13,70 @@ const list_rooms = async (req, res) => {
 };
 
 const create_room_form = (req, res) => {
-  res.render("create_room");
+  res.render("create_room", { userId: req.user.id });
+};
+
+const deleteRoom = async (req, res) => {
+  try {
+    console.log(req.params.id);
+    const roomId = req.params.id;
+    await Room.findByIdAndDelete(roomId);
+    res.redirect("/list-rooms/" + req.user.id);
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ error: "An error occurred while deleting the room." });
+  }
 };
 
 const create_room = async (req, res) => {
   try {
-    const room = new Room(req.body);
+    const { name, createdBy, participants } = req.body;
+
+    if (!name || !createdBy || !participants) {
+      return res.status(400).json({ error: "Semua field harus diisi" });
+    }
+
+    const room = new Room({
+      name,
+      createdBy,
+      participants: participants.split(",").map((p) => p.trim()),
+      userId: req.user.id, // Gunakan ID pengguna dari sesi
+    });
+    console.log(req.user.id);
+
     await room.save();
-    res.redirect("/");
+    res.json({ success: true, userId: req.user.id });
   } catch (err) {
     console.error(err);
+    res.status(500).json({ error: "Terjadi kesalahan saat membuat room" });
   }
 };
 
 const dashboard = async (req, res) => {
   try {
-    const room = await Room.findById(req.params.roomID);
+    const room = await Room.findById(req.params.roomId);
     if (!room) {
-      res.redirect("/");
+      res.redirect(`/list-rooms/${req.user.id}`);
     }
-    const expenses = await Expense.find({ room: req.params.roomID }).sort({
+    const expenses = await Expense.find({ room: req.params.roomId }).sort({
       createdAt: -1,
     });
 
     const detailedSplits = calculateDetailedSplits(expenses);
     const finalSplits = calculateSimplifiedSplits(detailedSplits);
     // const settlements = calculateDetailedSettlements(detailedSplits);
-    res.render("dashboard", { room, expenses, detailedSplits, finalSplits });
+    res.render("dashboard", {
+      sucess: true,
+      room,
+      expenses,
+      detailedSplits,
+      finalSplits,
+    });
   } catch (err) {
     console.error(err);
+    res.redirect(`/list-rooms/${req.user.id}`);
   }
 };
 
@@ -121,4 +158,10 @@ function calculateDetailedSettlements(detailedSplits) {
 
   return settlements;
 }
-module.exports = { list_rooms, dashboard, create_room, create_room_form };
+module.exports = {
+  list_rooms,
+  dashboard,
+  create_room,
+  create_room_form,
+  deleteRoom,
+};

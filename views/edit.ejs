@@ -5,11 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Expense Splitter - Edit Pengeluaran</title>
     <link href="/styles/shared-styles.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      window.expenseId = "<%= expense.id %>";
+    </script>
+    <script src="/js/edit.js" defer></script>
   </head>
   <body>
     <div class="container">
       <h1>Edit Pengeluaran</h1>
-      <form action="/edit/<%= expense.id %>" method="POST">
+      <div id="errorMessage" style="color: red; display: none"></div>
+      <form id="editExpenseForm">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
         <div>
           <label for="name">Nama Pengeluaran:</label>
           <input

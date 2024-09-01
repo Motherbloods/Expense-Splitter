@@ -5,12 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Expense Splitter - Tambah Pengeluaran Baru</title>
     <link href="/styles/shared-styles.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      window.roomId = "<%= room._id %>";
+    </script>
+    <script src="/js/create.js" defer></script>
   </head>
   <body>
     <div class="container">
       <h1>Tambah Pengeluaran Baru</h1>
       <h2><%= room.name %></h2>
-      <form action="/create/<%= roomId %>" method="POST">
+      <div id="errorMessage" style="color: red; display: none"></div>
+      <form id="expenseForm">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
         <div>
           <label for="name">Nama Pengeluaran:</label>
           <input type="text" id="name" name="name" required />
@@ -40,9 +47,13 @@
             value="<%= room.participants.join(', ') %>"
           />
         </div>
-        <button type="submit" class="btn">Simpan Pengeluaran</button>
+        <button type="submit" class="btn btn-add-expense" style="width: 100%">
+          Simpan Pengeluaran
+        </button>
       </form>
-      <a href="/dashboard/<%= roomId %>" class="btn">Kembali ke Dashboard</a>
+      <a href="/dashboard/<%= room._id %>" class="btn btn-back"
+        >Kembali ke Dashboard</a
+      >
     </div>
   </body>
 </html>

@@ -6,23 +6,47 @@
     <title>Expense Splitter - Dashboard <%= room.name %></title>
     <link href="/styles/shared-styles.css" rel="stylesheet" />
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script src="/js/dashboard.js" defer></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
   </head>
   <body>
     <div class="container">
-      <h1><i class="fas fa-chart-pie"></i> Dashboard <%= room.name %></h1>
+      <div class="header">
+        <h1><i class="fas fa-chart-pie"></i> Dashboard <%= room.name %></h1>
+        <div class="header-buttons">
+          <a href="/create/<%= room.id %>" class="btn btn-add-expense">
+            <span class="button-text">Tambah Pengeluaran</span>
+            <i class="fas fa-plus icon-mobile"></i>
+          </a>
+          <a
+            href="/list-rooms/<%= room.userId %>"
+            class="btn"
+            style="background-color: #607d8b; margin-bottom: 10px; color: white"
+          >
+            <span class="button-text">Kembali ke Daftar Room</span>
+            <i class="fas fa-arrow-left icon-mobile"></i>
+          </a>
+        </div>
+      </div>
       <% if (expenses && expenses.length > 0) { %>
       <div class="summary">
         <div class="summary-item">
           <h3>Total Pengeluaran</h3>
-          <p>a</p>
+          <p>
+            <%= expenses.reduce((sum, expense) => sum + expense.total,
+            0).toLocaleString('id-ID', {style: 'currency', currency: 'IDR'}) %>
+          </p>
         </div>
         <div class="summary-item">
           <h3>Jumlah Transaksi</h3>
-          <p>b</p>
+          <p><%= expenses.length %></p>
         </div>
         <div class="summary-item">
           <h3>Partisipan</h3>
-          <p>c</p>
+          <p><%= room.participants.length %></p>
         </div>
       </div>
 
@@ -30,7 +54,7 @@
 
       <div>
         <label for="filter-paidby">Filter Dibayar Oleh:</label>
-        <select id="filter-paidby" onchange="filterExpenses()">
+        <select id="filter-paidby">
           <option value="all">Semua</option>
           <% let payers = new Set(expenses.map(expense => expense.paidBy)); %>
           <% payers.forEach(payer => { %>
@@ -69,15 +93,24 @@
               <% }); %>
             </td>
             <td data-label="Aksi">
-              <a href="/edit/<%= expense.id %>" class="btn btn-edit"
+              <a
+                href="/edit/<%= expense.id %>"
+                style="width: 100%"
+                class="btn btn-edit"
                 ><i class="fas fa-edit"></i> Edit</a
               >
               <form
                 action="/delete/<%= expense.id %>"
                 method="POST"
                 style="display: inline"
+                onsubmit="confirmDelete(event)"
               >
-                <button type="submit" class="btn btn-delete">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                <button
+                  type="submit"
+                  class="btn btn-delete"
+                  style="width: 100%; margin-top: 10px"
+                >
                   <i class="fas fa-trash"></i> Hapus
                 </button>
               </form>
@@ -87,11 +120,12 @@
         </tbody>
       </table>
 
+      <% if (detailedSplits && Object.keys(detailedSplits).length > 0) { %>
       <div class="settlement">
         <h2><i class="fas fa-exchange-alt"></i> Penyelesaian Pembayaran</h2>
 
         <label for="recipient-filter">Filter by recipient:</label>
-        <select id="recipient-filter" onchange="filterSettlements()">
+        <select id="recipient-filter">
           <option value="">Semua</option>
           <% const recipients = new Set(); %> <% for (const [participant,
           payments] of Object.entries(detailedSplits)) { %> <% for (const
@@ -126,6 +160,7 @@
           </tbody>
         </table>
 
+        <% if (finalSplits && Object.keys(finalSplits).length > 0) { %>
         <h3>Simpel</h3>
         <table>
           <thead>
@@ -150,67 +185,15 @@
             <% } %> <% } %>
           </tbody>
         </table>
+        <% } else { %>
+        <p>Tidak ada penyelesaian pembayaran yang disederhanakan.</p>
+        <% } %>
       </div>
       <% } else { %>
+      <p>Tidak ada penyelesaian pembayaran yang tersedia.</p>
+      <% } %> <% } else { %>
       <p>Belum ada Pengeluaran untuk <%= room.name %></p>
       <% } %>
-
-      <a href="/create/<%= room.id %>" class="btn"
-        ><i class="fas fa-plus"></i> Tambah Pengeluaran Baru</a
-      >
-      <a href="/" class="btn"
-        ><i class="fas fa-arrow-left"></i> Kembali ke Daftar Room</a
-      >
     </div>
-
-    <script>
-      function filterExpenses() {
-        const filterValue = document.getElementById("filter-paidby").value;
-        const tableBody = document.getElementById("expense-table-body");
-        const rows = tableBody.getElementsByTagName("tr");
-        for (let i = 0; i < rows.length; i++) {
-          const paidBy = rows[i].getAttribute("data-paidby");
-          if (filterValue === "all" || filterValue === paidBy) {
-            rows[i].style.display = "";
-          } else {
-            rows[i].style.display = "none";
-          }
-        }
-      }
-
-      function filterSettlements() {
-        const filterValue = document
-          .getElementById("recipient-filter")
-          .value.toLowerCase();
-        const normalSettlements = document.querySelectorAll(
-          "#normal-settlements tr"
-        );
-        const simpleSettlements = document.querySelectorAll(
-          "#simple-settlements tr"
-        );
-
-        normalSettlements.forEach((settlement) => {
-          const recipient = settlement
-            .getAttribute("data-recipient")
-            .toLowerCase();
-          if (filterValue === "" || recipient.includes(filterValue)) {
-            settlement.classList.remove("hidden");
-          } else {
-            settlement.classList.add("hidden");
-          }
-        });
-
-        simpleSettlements.forEach((settlement) => {
-          const recipient = settlement
-            .getAttribute("data-recipient")
-            .toLowerCase();
-          if (filterValue === "" || recipient.includes(filterValue)) {
-            settlement.classList.remove("hidden");
-          } else {
-            settlement.classList.add("hidden");
-          }
-        });
-      }
-    </script>
   </body>
 </html>
