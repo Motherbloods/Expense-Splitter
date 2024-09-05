@@ -20,6 +20,7 @@ const {
   dashboard,
   deleteRoom,
 } = require("../controller/rooms.controller");
+
 const {
   register,
   login,

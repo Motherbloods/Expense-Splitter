@@ -4,25 +4,6 @@ const jwt = require("jsonwebtoken");
 const rateLimit = require("express-rate-limit");
 const { body, validationResult } = require("express-validator");
 
-const registerValidation = [
-  body("username")
-    .isLength({ min: 3 })
-    .withMessage("Username minimal 3 karakter"),
-  body("password")
-    .isLength({ min: 8 })
-    .withMessage("Password minimal 8 karakter")
-    .matches(/\d/)
-    .withMessage("Password harus mengandung angka")
-    .matches(/[A-Z]/)
-    .withMessage("Password harus mengandung huruf besar"),
-  body("confirmPassword").custom((value, { req }) => {
-    if (value !== req.body.password) {
-      throw new Error("Konfirmasi password tidak cocok");
-    }
-    return true;
-  }),
-];
-
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
@@ -31,6 +12,11 @@ const loginLimiter = rateLimit({
 
 const login = async (req, res) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
     const { username, password } = req.body;
     if (!username || !password) {
       return res.status(400).json({ error: "Please fill all required fields" });
@@ -91,7 +77,7 @@ const register = async (req, res) => {
 
     const saltRounds = 10;
     const hashPass = await bcrypt.hash(password, saltRounds);
-    const newUser = await User.create({ username, password: hashPass });
+    await User.create({ username, password: hashPass });
 
     res.json({ success: true });
   } catch (err) {

@@ -21,16 +21,13 @@
             <span class="button-text">Tambah Pengeluaran</span>
             <i class="fas fa-plus icon-mobile"></i>
           </a>
-          <a
-            href="/list-rooms/<%= room.userId %>"
-            class="btn"
-            style="background-color: #607d8b; margin-bottom: 10px; color: white"
-          >
+          <a href="/list-rooms/<%= room.userId %>" class="btn btn-back">
             <span class="button-text">Kembali ke Daftar Room</span>
             <i class="fas fa-arrow-left icon-mobile"></i>
           </a>
         </div>
       </div>
+
       <% if (expenses && expenses.length > 0) { %>
       <div class="summary">
         <div class="summary-item">
@@ -50,90 +47,96 @@
         </div>
       </div>
 
-      <h2><i class="fas fa-list"></i> Daftar Pengeluaran</h2>
+      <div class="expense-list">
+        <h2><i class="fas fa-list"></i> Daftar Pengeluaran</h2>
 
-      <div>
-        <label for="filter-paidby">Filter Dibayar Oleh:</label>
-        <select id="filter-paidby">
-          <option value="all">Semua</option>
-          <% let payers = new Set(expenses.map(expense => expense.paidBy)); %>
-          <% payers.forEach(payer => { %>
-          <option value="<%= payer %>"><%= payer %></option>
-          <% }) %>
-        </select>
-      </div>
+        <div class="filter-section">
+          <label for="filter-paidby">Filter Dibayar Oleh:</label>
+          <select id="filter-paidby">
+            <option value="all">Semua</option>
+            <% let payers = new Set(expenses.map(expense => expense.paidBy)); %>
+            <% payers.forEach(payer => { %>
+            <option value="<%= payer %>"><%= payer %></option>
+            <% }) %>
+          </select>
+        </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Nama Pengeluaran</th>
-            <th>Dibayar Oleh</th>
-            <th>Total</th>
-            <th>Partisipan</th>
-            <th>Pembagian</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody id="expense-table-body">
-          <% expenses.forEach(function(expense) { %>
-          <tr data-paidby="<%= expense.paidBy %>">
-            <td data-label="Nama Pengeluaran"><%= expense.name %></td>
-            <td data-label="Dibayar Oleh"><%= expense.paidBy %></td>
-            <td data-label="Total">
-              <%= expense.total.toLocaleString('id-ID', {style: 'currency',
-              currency: 'IDR'}) %>
-            </td>
-            <td data-label="Partisipan">
-              <%= expense.participants.join(', ') %>
-            </td>
-            <td data-label="Pembagian">
-              <% expense.splits.forEach(function(split) { %> <%=
-              split.participant %>: <%= split.amount.toLocaleString('id-ID',
-              {style: 'currency', currency: 'IDR'}) %><br />
-              <% }); %>
-            </td>
-            <td data-label="Aksi">
-              <a
-                href="/edit/<%= expense.id %>"
-                style="width: 100%"
-                class="btn btn-edit"
-                ><i class="fas fa-edit"></i> Edit</a
-              >
-              <form
-                action="/delete/<%= expense.id %>"
-                method="POST"
-                style="display: inline"
-                onsubmit="confirmDelete(event)"
-              >
-                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-                <button
-                  type="submit"
-                  class="btn btn-delete"
-                  style="width: 100%; margin-top: 10px"
+        <table>
+          <thead>
+            <tr>
+              <th>Nama Pengeluaran</th>
+              <th>Dibayar Oleh</th>
+              <th>Total</th>
+              <th>Partisipan</th>
+              <th>Pembagian</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="expense-table-body">
+            <% expenses.forEach(function(expense) { %>
+            <tr data-paidby="<%= expense.paidBy %>">
+              <td data-label="Nama Pengeluaran">
+                <%= expense.name.split(' ').map(word =>
+                word.charAt(0).toUpperCase() + word.slice(1)).join(' ') %>
+              </td>
+              <td data-label="Dibayar Oleh">
+                <%= expense.paidBy.split(' ').map(word =>
+                word.charAt(0).toUpperCase() + word.slice(1)).join(' ') %>
+              </td>
+              <td data-label="Total">
+                <%= expense.total.toLocaleString('id-ID', {style: 'currency',
+                currency: 'IDR'}) %>
+              </td>
+              <td data-label="Partisipan">
+                <%= expense.participants.map(participant =>
+                participant.split(',') .map(word => word.charAt(0).toUpperCase()
+                + word.slice(1)).join(' ')).join(', ') %>
+              </td>
+              <td data-label="Pembagian">
+                <% expense.splits.forEach(function(split) { %> <%=
+                split.participant.split(' ').map(word =>
+                word.charAt(0).toUpperCase() + word.slice(1)).join(' ') %> : <%=
+                split.amount.toLocaleString('id-ID', {style: 'currency',
+                currency: 'IDR'}) %><br />
+                <% }); %>
+              </td>
+              <td data-label="Aksi">
+                <a href="/edit/<%= expense.id %>" class="btn btn-edit"
+                  ><i class="fas fa-edit"></i> Edit</a
                 >
-                  <i class="fas fa-trash"></i> Hapus
-                </button>
-              </form>
-            </td>
-          </tr>
-          <% }); %>
-        </tbody>
-      </table>
+                <form
+                  action="/delete/<%= expense.id %>"
+                  method="POST"
+                  onsubmit="confirmDelete(event)"
+                >
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                  <button type="submit" class="btn btn-delete">
+                    <i class="fas fa-trash"></i> Hapus
+                  </button>
+                </form>
+              </td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
 
       <% if (detailedSplits && Object.keys(detailedSplits).length > 0) { %>
       <div class="settlement">
         <h2><i class="fas fa-exchange-alt"></i> Penyelesaian Pembayaran</h2>
 
-        <label for="recipient-filter">Filter by recipient:</label>
-        <select id="recipient-filter">
-          <option value="">Semua</option>
-          <% const recipients = new Set(); %> <% for (const [participant,
-          payments] of Object.entries(detailedSplits)) { %> <% for (const
-          receiver of Object.keys(payments)) { %> <% recipients.add(receiver);
-          %> <% } %> <% } %> <% for (const receiver of recipients) { %>
-          <option value="<%= receiver %>"><%= receiver %></option>
-          <% } %>
-        </select>
+        <div class="filter-section">
+          <label for="recipient-filter">Filter by recipient:</label>
+          <select id="recipient-filter">
+            <option value="">Semua</option>
+            <% const recipients = new Set(); %> <% for (const [participant,
+            payments] of Object.entries(detailedSplits)) { %> <% for (const
+            receiver of Object.keys(payments)) { %> <% recipients.add(receiver);
+            %> <% } %> <% } %> <% for (const receiver of recipients) { %>
+            <option value="<%= receiver %>"><%= receiver %></option>
+            <% } %>
+          </select>
+        </div>
 
         <h3>Normal</h3>
         <table>
@@ -142,18 +145,34 @@
               <th>Pengirim</th>
               <th>Penerima</th>
               <th>Jumlah</th>
+              <th>Details</th>
             </tr>
           </thead>
           <tbody id="normal-settlements">
             <% for (const [participant, payments] of
-            Object.entries(detailedSplits)) { %> <% for (const [receiver,
-            amount] of Object.entries(payments)) { %> <% if (amount < 0) { %>
+            Object.entries(detailedSplits)) { %> <% for (const [receiver, {
+            total, details }] of Object.entries(payments)) { %> <% if (total <
+            0) { %>
             <tr data-recipient="<%= receiver %>">
-              <td data-label="Pengirim"><%= participant %></td>
-              <td data-label="Penerima"><%= receiver %></td>
+              <td data-label="Pengirim">
+                <%= participant.split(' ').map(word =>
+                word.charAt(0).toUpperCase() + word.slice(1)).join(' ') %>
+              </td>
+              <td data-label="Penerima">
+                <%= receiver.split(' ').map(word => word.charAt(0).toUpperCase()
+                + word.slice(1)).join(' ') %>
+              </td>
               <td data-label="Jumlah">
-                <%= Math.abs(amount).toLocaleString('id-ID', {style: 'currency',
+                <%= Math.abs(total).toLocaleString('id-ID', {style: 'currency',
                 currency: 'IDR'}) %>
+              </td>
+              <td data-label="Details">
+                <% for (const [expenseName, amount] of Object.entries(details))
+                { %> <% if (amount < 0) { %> <%= expenseName.replace(/\b\w/g,
+                char => char.toUpperCase()) %> : <%=
+                Math.abs(amount).toLocaleString('id-ID', {style: 'currency',
+                currency: 'IDR'}) %><br />
+                <% } %> <% } %>
               </td>
             </tr>
             <% } %> <% } %> <% } %>
@@ -168,18 +187,32 @@
               <th>Pengirim</th>
               <th>Penerima</th>
               <th>Jumlah</th>
+              <th>Details</th>
             </tr>
           </thead>
           <tbody id="simple-settlements">
             <% for (const [participant, payments] of
-            Object.entries(finalSplits)) { %> <% for (const [receiver, amount]
-            of Object.entries(payments)) { %>
+            Object.entries(finalSplits)) { %> <% for (const [receiver, { total,
+            details }] of Object.entries(payments)) { %>
             <tr data-recipient="<%= participant %>">
-              <td data-label="Pengirim"><%= receiver %></td>
-              <td data-label="Penerima"><%= participant %></td>
+              <td data-label="Pengirim">
+                <%= receiver.split(' ').map(word => word.charAt(0).toUpperCase()
+                + word.slice(1)).join(' ') %>
+              </td>
+              <td data-label="Penerima">
+                <%= participant.split(' ').map(word =>
+                word.charAt(0).toUpperCase() + word.slice(1)).join(' ') %>
+              </td>
               <td data-label="Jumlah">
-                <%= amount.toLocaleString('id-ID', {style: 'currency', currency:
+                <%= total.toLocaleString('id-ID', {style: 'currency', currency:
                 'IDR'}) %>
+              </td>
+              <td data-label="Details">
+                <% for (const [expenseName, amount] of Object.entries(details))
+                { %> <%= expenseName.replace(/\b\w/g, char =>
+                char.toUpperCase()) %> : <%= amount.toLocaleString('id-ID',
+                {style: 'currency', currency: 'IDR'}) %><br />
+                <% } %>
               </td>
             </tr>
             <% } %> <% } %>
@@ -187,6 +220,34 @@
         </table>
         <% } else { %>
         <p>Tidak ada penyelesaian pembayaran yang disederhanakan.</p>
+        <% } %> <% if (Object.keys(evenParticipants).length > 0) { %>
+        <h3>Partisipan yang Impas</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Partisipan</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for (const [key, { participants, details }] of
+            Object.entries(evenParticipants)) { %>
+            <tr>
+              <td data-label="Partisipan"><%= participants.join(' dan ') %></td>
+              <td data-label="Details">
+                <%= participants.join(' dan ') %> tidak perlu membayar satu sama
+                lain.<br />
+                Details:<br />
+                <% for (const [expenseName, { amount, paidBy }] of
+                Object.entries(details)) { %> <%= expenseName %>: <%=
+                amount.toLocaleString('id-ID', {style: 'currency', currency:
+                'IDR'}) %> (dibayar oleh <%= paidBy %>)<br />
+                <% } %>
+              </td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
         <% } %>
       </div>
       <% } else { %>

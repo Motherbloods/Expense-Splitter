@@ -65,14 +65,16 @@ const dashboard = async (req, res) => {
     });
 
     const detailedSplits = calculateDetailedSplits(expenses);
-    const finalSplits = calculateSimplifiedSplits(detailedSplits);
-    // const settlements = calculateDetailedSettlements(detailedSplits);
+    const { finalSplits, evenParticipants } =
+      calculateSimplifiedSplits(detailedSplits);
+
     res.render("dashboard", {
       sucess: true,
       room,
       expenses,
       detailedSplits,
       finalSplits,
+      evenParticipants,
     });
   } catch (err) {
     console.error(err);
@@ -87,16 +89,22 @@ function calculateDetailedSplits(expenses) {
     const perPersonAmount = expense.total / expense.participants.length;
     expense.participants.forEach((participant) => {
       if (!splits[participant]) splits[participant] = {};
-      if (!splits[participant][expense.paidBy])
-        splits[participant][expense.paidBy] = 0;
+      if (!splits[participant][expense.paidBy]) {
+        splits[participant][expense.paidBy] = { total: 0, details: {} };
+      }
 
-      splits[participant][expense.paidBy] -= perPersonAmount;
+      splits[participant][expense.paidBy].total -= perPersonAmount;
+      splits[participant][expense.paidBy].details[expense.name] =
+        -perPersonAmount;
     });
 
     if (!splits[expense.paidBy]) splits[expense.paidBy] = {};
-    if (!splits[expense.paidBy][expense.paidBy])
-      splits[expense.paidBy][expense.paidBy] = 0;
-    splits[expense.paidBy][expense.paidBy] += expense.total;
+    if (!splits[expense.paidBy][expense.paidBy]) {
+      splits[expense.paidBy][expense.paidBy] = { total: 0, details: {} };
+    }
+    splits[expense.paidBy][expense.paidBy].total += expense.total;
+    splits[expense.paidBy][expense.paidBy].details[expense.name] =
+      expense.total;
   });
 
   return splits;
@@ -104,11 +112,12 @@ function calculateDetailedSplits(expenses) {
 
 function calculateSimplifiedSplits(detailedSplits) {
   const simplifiedSplits = {};
+  const evenParticipants = {};
 
   for (const participant in detailedSplits) {
     for (const receiver in detailedSplits[participant]) {
       if (participant !== receiver) {
-        const amount = detailedSplits[participant][receiver];
+        const { total, details } = detailedSplits[participant][receiver];
 
         if (!simplifiedSplits[participant]) {
           simplifiedSplits[participant] = {};
@@ -117,10 +126,23 @@ function calculateSimplifiedSplits(detailedSplits) {
           simplifiedSplits[receiver] = {};
         }
 
-        simplifiedSplits[participant][receiver] =
-          (simplifiedSplits[participant][receiver] || 0) + amount;
-        simplifiedSplits[receiver][participant] =
-          (simplifiedSplits[receiver][participant] || 0) - amount;
+        if (!simplifiedSplits[participant][receiver]) {
+          simplifiedSplits[participant][receiver] = { total: 0, details: {} };
+        }
+        if (!simplifiedSplits[receiver][participant]) {
+          simplifiedSplits[receiver][participant] = { total: 0, details: {} };
+        }
+
+        simplifiedSplits[participant][receiver].total += total;
+        simplifiedSplits[receiver][participant].total -= total;
+
+        for (const expenseName in details) {
+          if (!simplifiedSplits[participant][receiver].details[expenseName]) {
+            simplifiedSplits[participant][receiver].details[expenseName] = 0;
+          }
+          simplifiedSplits[participant][receiver].details[expenseName] +=
+            details[expenseName];
+        }
       }
     }
   }
@@ -128,17 +150,42 @@ function calculateSimplifiedSplits(detailedSplits) {
   const finalSplits = {};
   for (const participant in simplifiedSplits) {
     for (const receiver in simplifiedSplits[participant]) {
-      const amount = simplifiedSplits[participant][receiver];
-      if (amount > 0) {
+      const { total, details } = simplifiedSplits[participant][receiver];
+      if (total > 0) {
         if (!finalSplits[participant]) {
           finalSplits[participant] = {};
         }
-        finalSplits[participant][receiver] = amount;
+        finalSplits[participant][receiver] = { total, details };
+      } else if (total === 0) {
+        const key = [participant, receiver].sort().join("-");
+        if (!evenParticipants[key]) {
+          evenParticipants[key] = {
+            participants: [participant, receiver],
+            details: {},
+          };
+        }
+        // Merge details from both directions, preserving who paid for each expense
+        for (const [expenseName, amount] of Object.entries(details)) {
+          evenParticipants[key].details[expenseName] = {
+            amount: Math.abs(amount),
+            paidBy: amount > 0 ? participant : receiver,
+          };
+        }
+        for (const [expenseName, amount] of Object.entries(
+          simplifiedSplits[receiver][participant].details
+        )) {
+          if (!evenParticipants[key].details[expenseName]) {
+            evenParticipants[key].details[expenseName] = {
+              amount: Math.abs(amount),
+              paidBy: amount > 0 ? receiver : participant,
+            };
+          }
+        }
       }
     }
   }
 
-  return finalSplits;
+  return { finalSplits, evenParticipants };
 }
 
 function calculateDetailedSettlements(detailedSplits) {

@@ -4,7 +4,7 @@ const Expense = require("../models/Expense");
 const create_expense_form = async (req, res) => {
   try {
     const roomId = req.params.roomId;
-    const room = await Room.findById(roomId);
+    const room = await Room.findById(roomId).lean();
     if (!room) {
       return res.status(404).send("Room not found");
     }

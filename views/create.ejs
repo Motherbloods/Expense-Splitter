@@ -10,24 +10,38 @@
       window.roomId = "<%= room._id %>";
     </script>
     <script src="/js/create.js" defer></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
   </head>
   <body>
     <div class="container">
-      <h1>Tambah Pengeluaran Baru</h1>
+      <div class="header">
+        <h1><i class="fas fa-plus-circle"></i> Tambah Pengeluaran Baru</h1>
+        <div class="header-buttons">
+          <a href="/dashboard/<%= room._id %>" class="btn btn-back">
+            <span class="button-text">Kembali ke Dashboard</span>
+            <i class="fas fa-arrow-left icon-mobile"></i>
+          </a>
+        </div>
+      </div>
       <h2><%= room.name %></h2>
       <div id="errorMessage" style="color: red; display: none"></div>
-      <form id="expenseForm">
+      <form id="expenseForm" class="expense-form">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-        <div>
-          <label for="name">Nama Pengeluaran:</label>
+        <div class="form-group">
+          <label for="name"><i class="fas fa-tag"></i> Nama Pengeluaran:</label>
           <input type="text" id="name" name="name" required />
         </div>
-        <div>
-          <label for="paidBy">Dibayar Oleh:</label>
+        <div class="form-group">
+          <label for="paidBy"><i class="fas fa-user"></i> Dibayar Oleh:</label>
           <input type="text" id="paidBy" name="paidBy" required />
         </div>
-        <div>
-          <label for="total">Total Pengeluaran:</label>
+        <div class="form-group">
+          <label for="total"
+            ><i class="fas fa-money-bill-wave"></i> Total Pengeluaran:</label
+          >
           <input
             type="number"
             id="total"
@@ -37,8 +51,11 @@
             step="0.01"
           />
         </div>
-        <div>
-          <label for="participants">Partisipan (pisahkan dengan koma):</label>
+        <div class="form-group">
+          <label for="participants"
+            ><i class="fas fa-users"></i> Partisipan (pisahkan dengan
+            koma):</label
+          >
           <input
             type="text"
             id="participants"
@@ -47,13 +64,10 @@
             value="<%= room.participants.join(', ') %>"
           />
         </div>
-        <button type="submit" class="btn btn-add-expense" style="width: 100%">
-          Simpan Pengeluaran
+        <button type="submit" class="btn btn-add-expense">
+          <i class="fas fa-save"></i> Simpan Pengeluaran
         </button>
       </form>
-      <a href="/dashboard/<%= room._id %>" class="btn btn-back"
-        >Kembali ke Dashboard</a
-      >
     </div>
   </body>
 </html>

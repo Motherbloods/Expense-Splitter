@@ -10,15 +10,27 @@
       window.expenseId = "<%= expense.id %>";
     </script>
     <script src="/js/edit.js" defer></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
   </head>
   <body>
     <div class="container">
-      <h1>Edit Pengeluaran</h1>
+      <div class="header">
+        <h1><i class="fas fa-edit"></i> Edit Pengeluaran</h1>
+        <div class="header-buttons">
+          <a href="/dashboard/<%= roomId %>" class="btn btn-back">
+            <span class="button-text">Kembali ke Dashboard</span>
+            <i class="fas fa-arrow-left icon-mobile"></i>
+          </a>
+        </div>
+      </div>
       <div id="errorMessage" style="color: red; display: none"></div>
-      <form id="editExpenseForm">
+      <form id="editExpenseForm" class="expense-form">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-        <div>
-          <label for="name">Nama Pengeluaran:</label>
+        <div class="form-group">
+          <label for="name"><i class="fas fa-tag"></i> Nama Pengeluaran:</label>
           <input
             type="text"
             id="name"
@@ -27,8 +39,8 @@
             required
           />
         </div>
-        <div>
-          <label for="paidBy">Dibayar Oleh:</label>
+        <div class="form-group">
+          <label for="paidBy"><i class="fas fa-user"></i> Dibayar Oleh:</label>
           <input
             type="text"
             id="paidBy"
@@ -37,8 +49,10 @@
             required
           />
         </div>
-        <div>
-          <label for="total">Total Pengeluaran:</label>
+        <div class="form-group">
+          <label for="total"
+            ><i class="fas fa-money-bill-wave"></i> Total Pengeluaran:</label
+          >
           <input
             type="number"
             id="total"
@@ -47,8 +61,11 @@
             required
           />
         </div>
-        <div>
-          <label for="participants">Partisipan (pisahkan dengan koma):</label>
+        <div class="form-group">
+          <label for="participants"
+            ><i class="fas fa-users"></i> Partisipan (pisahkan dengan
+            koma):</label
+          >
           <input
             type="text"
             id="participants"
@@ -57,11 +74,10 @@
             required
           />
         </div>
-        <button type="submit" class="btn btn-edit">Perbarui Pengeluaran</button>
+        <button type="submit" class="btn btn-edit">
+          <i class="fas fa-save"></i> Perbarui Pengeluaran
+        </button>
       </form>
-      <a href="/dashboard/<%= roomId %>" class="btn"
-        >Batal dan Kembali ke Dashboard</a
-      >
     </div>
   </body>
 </html>
