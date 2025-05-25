@@ -3,7 +3,7 @@
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
-    "csurf": "^1.11.0",
+    "csurf": "^1.2.2",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
@@ -12,7 +12,8 @@
     "install": "^0.13.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.5.1",
-    "npm": "^10.8.3"
+    "npm": "^10.8.3",
+    "puppeteer": "^24.9.0"
   },
   "devDependencies": {
     "jest": "^29.7.0",

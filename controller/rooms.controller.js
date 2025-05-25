@@ -211,4 +211,6 @@ module.exports = {
   create_room,
   create_room_form,
   deleteRoom,
+  calculateDetailedSplits,
+  calculateSimplifiedSplits,
 };

@@ -29,6 +29,7 @@ const {
   loginLimiter,
   logout,
 } = require("../controller/auth.controller");
+const download_expense = require("../controller/download.controller");
 
 // Room Routes
 router.get(
@@ -50,6 +51,12 @@ router.post(
   isLogged,
   verifyResourceOwnership("room"),
   deleteRoom
+);
+router.get(
+  "/download-expense/:roomId",
+  isLogged,
+  verifyResourceOwnership("room"),
+  download_expense
 );
 
 // Expense Routes

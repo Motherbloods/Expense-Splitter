@@ -22,6 +22,10 @@
             <span class="button-text">Tambah Pengeluaran</span>
             <i class="fas fa-plus icon-mobile"></i>
           </a>
+          <a href="/download-expense/<%= room.id %>" class="btn btn-expense"
+            ><span class="button-text">Download</span>
+            <i class="fas fa-download icon-mobile"></i>
+          </a>
           <a href="/list-rooms/<%= room.userId %>" class="btn btn-back">
             <span class="button-text">Kembali ke Daftar Room</span>
             <i class="fas fa-arrow-left icon-mobile"></i>
@@ -310,4 +314,35 @@
       <% } %>
     </div>
   </body>
+  <script>
+    async function downloadPDF(roomId) {
+      try {
+        const response = await fetch(
+          `http://localhost:8000/download-expense/${roomId}`,
+          {
+            method: "GET",
+          }
+        );
+        console.log("Response status:", response.status);
+        console.log("Response headers:", response.headers);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Download failed");
+        }
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        // Gunakan filename sama seperti backend (atau dari Content-Disposition header jika ingin lebih canggih)
+        a.download = `Laporan_${roomId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error("Download error:", error);
+        alert("Gagal mengunduh PDF: " + error.message);
+      }
+    }
+  </script>
 </html>
